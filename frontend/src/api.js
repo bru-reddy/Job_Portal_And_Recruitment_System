@@ -2,7 +2,7 @@ const BASE=(import.meta.env.VITE_API_URL||"").replace(/\/$/,"");
 
 async function request(path,options={}){
   const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),15000);
+  const timer=setTimeout(()=>controller.abort(),90000);
   try{
     const res=await fetch(BASE+"/api"+path,{
       ...options,
@@ -15,8 +15,8 @@ async function request(path,options={}){
     if(!res.ok) throw new Error(data.message||data.error||("Request failed ("+res.status+")"));
     return data;
   }catch(err){
-    if(err.name==="AbortError") throw new Error("The server took too long to respond. Please try again.");
-    if(err instanceof TypeError) throw new Error("Unable to reach the JobSphere server. Check the API URL and backend deployment.");
+    if(err.name==="AbortError") throw new Error("The JobSphere server did not respond within 90 seconds. Open the backend /api/health URL and check the Render service logs.");
+    if(err instanceof TypeError) throw new Error("Unable to reach the JobSphere server. Check the API URL, backend service, and CORS settings.");
     throw err;
   }finally{clearTimeout(timer);}
 }

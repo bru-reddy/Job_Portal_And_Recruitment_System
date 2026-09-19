@@ -5,12 +5,18 @@ import com.jobsphere.repository.JobRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 public class DemoJobData {
  @Bean
- CommandLineRunner seedCatalogJobs(JobRepository jobs){
+ CommandLineRunner seedCatalogJobs(JobRepository jobs, JdbcTemplate jdbc){
   return args -> {
+   // Existing Render/PostgreSQL databases may still have recruiter_id marked NOT NULL
+   // from the original schema. Demo catalog jobs intentionally have no recruiter account,
+   // so make the foreign-key column nullable before inserting them.
+   jdbc.execute("ALTER TABLE jobs ALTER COLUMN recruiter_id DROP NOT NULL");
+
    add(jobs,"Software Engineer","Microsoft","Hyderabad, India","Full-time","Early career","₹8–18 LPA","Software engineering role for the JobSphere demo application flow.","Java, C++, Azure, DSA");
    add(jobs,"Software Engineer II","Google","Hyderabad, India","Full-time","Early career","₹12–24 LPA","Engineering opportunity used only for this recruitment-system simulation.","Java, Python, Go, DSA");
    add(jobs,"Software Development Engineer","Amazon","Hyderabad, India","Full-time","Entry-level","₹9–20 LPA","Backend and distributed-systems role for the demo portal.","Java, AWS, SQL, DSA");
@@ -27,6 +33,16 @@ public class DemoJobData {
  }
  private void add(JobRepository jobs,String title,String company,String location,String type,String level,String salary,String description,String skills){
   if(jobs.existsByCompanyIgnoreCaseAndTitleIgnoreCase(company,title)) return;
-  Job j=new Job();j.setTitle(title);j.setCompany(company);j.setLocation(location);j.setType(type);j.setLevel(level);j.setSalary(salary);j.setDescription(description);j.setSkills(skills);j.setActive(true);jobs.save(j);
+  Job j=new Job();
+  j.setTitle(title);
+  j.setCompany(company);
+  j.setLocation(location);
+  j.setType(type);
+  j.setLevel(level);
+  j.setSalary(salary);
+  j.setDescription(description);
+  j.setSkills(skills);
+  j.setActive(true);
+  jobs.save(j);
  }
 }

@@ -4,11 +4,9 @@ async function request(path,options={}){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),90000);
   try{
-    const res=await fetch(BASE+"/api"+path,{
-      ...options,
-      signal:controller.signal,
-      headers:{"Content-Type":"application/json",...(options.headers||{})}
-    });
+    const isForm=options.body instanceof FormData;
+    const headers=isForm?{...(options.headers||{})}:{"Content-Type":"application/json",...(options.headers||{})};
+    const res=await fetch(BASE+"/api"+path,{...options,signal:controller.signal,headers});
     const text=await res.text();
     let data={};
     try{data=text?JSON.parse(text):{};}catch{data={message:text};}
@@ -29,5 +27,7 @@ export const api={
   createJob:(body)=>request("/jobs",{method:"POST",body:JSON.stringify(body)}),
   applications:(candidateId)=>request("/applications/candidate/"+candidateId),
   recruiterApplications:(recruiterId)=>request("/applications/recruiter/"+recruiterId),
-  apply:(jobId,candidateId)=>request("/applications?jobId="+jobId+"&candidateId="+candidateId,{method:"POST"})
+  apply:(formData)=>request("/applications",{method:"POST",body:formData}),
+  updateApplicationStatus:(id,status)=>request("/applications/"+id+"/status?status="+encodeURIComponent(status),{method:"PATCH"}),
+  resumeUrl:(id)=>BASE+"/api/applications/"+id+"/resume"
 };

@@ -65,7 +65,7 @@ public class ApplicationController {
  public ResponseEntity<byte[]> resume(@PathVariable Long id){
   return apps.findById(id).map(a->ResponseEntity.ok()
     .contentType(MediaType.APPLICATION_PDF)
-    .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+(a.getResumeFileName()==null?"resume.pdf":a.getResumeFileName().replace(""",""))+"\"")
+    .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+(a.getResumeFileName()==null?"resume.pdf":a.getResumeFileName().replace("\"",""))+"\"")
     .body(a.getResumeData())
   ).orElse(ResponseEntity.notFound().build());
  }

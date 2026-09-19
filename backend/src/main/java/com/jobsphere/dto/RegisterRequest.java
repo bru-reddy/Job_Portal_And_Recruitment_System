@@ -1,2 +1,13 @@
 package com.jobsphere.dto;
-public record RegisterRequest(String name,String email,String password,String role) {}
+
+public record RegisterRequest(
+ String name,
+ String email,
+ String password,
+ String role,
+ String companyName,
+ String companyWebsite,
+ String companyIndustry,
+ String companyDescription,
+ String companyCode
+) {}

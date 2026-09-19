@@ -2,7 +2,9 @@ package com.jobsphere.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.time.LocalDateTime;\nimport org.hibernate.annotations.JdbcTypeCode;\nimport org.hibernate.type.SqlTypes;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name="applications", uniqueConstraints=@UniqueConstraint(columnNames={"job_id","candidate_id"}))
@@ -23,7 +25,9 @@ public class Application {
  private String resumeFileName;
  private String resumeContentType;
 
- @Lob @Basic(fetch=FetchType.LAZY) @JsonIgnore
+ @JdbcTypeCode(SqlTypes.VARBINARY)
+ @Basic(fetch=FetchType.LAZY)
+ @JsonIgnore
  private byte[] resumeData;
 
  public Application() {}

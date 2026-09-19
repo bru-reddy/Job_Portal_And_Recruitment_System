@@ -1,6 +1,8 @@
 package com.jobsphere.model;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
 @Entity @Table(name="jobs")
 public class Job {
  @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
@@ -8,9 +10,10 @@ public class Job {
  @Column(nullable=false) private String company;
  @Column(nullable=false) private String location;
  private String type, level, salary, description, skills;
- @ManyToOne(optional=false) private User recruiter;
+ @ManyToOne(optional=true) private User recruiter;
  private boolean active=true;
  private LocalDateTime createdAt=LocalDateTime.now();
+
  public Job() {}
  public Long getId(){return id;} public String getTitle(){return title;} public void setTitle(String v){title=v;}
  public String getCompany(){return company;} public void setCompany(String v){company=v;}

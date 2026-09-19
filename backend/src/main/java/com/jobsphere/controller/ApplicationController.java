@@ -55,7 +55,11 @@ public class ApplicationController {
  public List<Application> candidate(@PathVariable Long id){return apps.findByCandidateIdOrderByAppliedAtDesc(id);}
 
  @GetMapping("/recruiter/{id}")
- public List<Application> recruiter(@PathVariable Long id){return apps.findByJobRecruiterIdOrderByAppliedAtDesc(id);}
+ public List<Application> recruiter(@PathVariable Long id){
+  var company=users.findById(id).orElse(null);
+  if(company==null||company.getRole()!=Role.RECRUITER) return List.of();
+  return apps.findByJobRecruiterIdOrJobCompanyIgnoreCaseOrderByAppliedAtDesc(id,company.getCompanyName());
+ }
 
  @GetMapping("/{id}/resume")
  public ResponseEntity<byte[]> resume(@PathVariable Long id){

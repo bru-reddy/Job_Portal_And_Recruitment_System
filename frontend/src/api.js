@@ -25,5 +25,5 @@ export const api={
  recruiterApplications:id=>request("/applications/recruiter/"+id),
  companyApplications:id=>request("/applications/company/"+id),
  apply:body=>request("/applications",{method:"POST",body:JSON.stringify(body)}),
- updateApplicationStatus:(id,status)=>request("/applications/"+id+"/status?status="+encodeURIComponent(status),{method:"PATCH"})
+ updateApplicationStatus:(id,status,recruiterId)=>request("/applications/"+id+"/status?status="+encodeURIComponent(status)+"&recruiterId="+encodeURIComponent(recruiterId),{method:"PATCH"})
 };

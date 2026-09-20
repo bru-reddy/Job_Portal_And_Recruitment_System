@@ -1,6 +1,7 @@
 package com.jobsphere.repository;
 
 import com.jobsphere.model.Application;
+import com.jobsphere.model.ApplicationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

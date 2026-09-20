@@ -14,6 +14,9 @@ public class JobController {
  public List<Job> list(@RequestParam(required=false) String search){
   return search==null||search.isBlank()?jobs.findByActiveTrueOrderByCreatedAtDesc():jobs.findByActiveTrueAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(search);
  }
+ @GetMapping("/recruiter/{recruiterId}")
+ public List<Job> recruiterJobs(@PathVariable Long recruiterId){return jobs.findByRecruiterIdOrderByCreatedAtDesc(recruiterId);}
+
  @GetMapping("/{id}")
  public ResponseEntity<Job> get(@PathVariable Long id){return jobs.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());}
 

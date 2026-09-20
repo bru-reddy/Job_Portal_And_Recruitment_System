@@ -28,7 +28,7 @@ public class DemoJobInitializer {
    addIfMissing(jobs,"Junior Software Developer","Capgemini","Hyderabad, India","Full-time","Entry-level","₹5–9 LPA","Java, SQL, Git, REST API","Bachelor's degree; 0–2 years; software development fundamentals.","Support development and integration of enterprise applications.","Capgemini Careers","https://www.capgemini.com/in-en/careers/");
   };
  }
- private void addIfMissing(JobRepository jobs,String title,String company,String location,String type,String level,String salary,String skills,String eligibility,String description,String sourceName,String sourceUrl){\n  if(jobs.existsByCompanyIgnoreCaseAndTitleIgnoreCase(company,title)) return;
+ private void addIfMissing(JobRepository jobs,String title,String company,String location,String type,String level,String salary,String skills,String eligibility,String description,String sourceName,String sourceUrl ){
   Job j=new Job(); j.setTitle(title);j.setCompany(company);j.setLocation(location);j.setType(type);j.setLevel(level);j.setSalary(salary);j.setSkills(skills);j.setEligibilityCriteria(eligibility);j.setDescription(description);j.setSourceName(sourceName);j.setSourceUrl(sourceUrl);j.setActive(true);jobs.save(j);
  }
 }

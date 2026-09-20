@@ -9,7 +9,10 @@ public class Job {
  @Column(nullable=false) private String title;
  @Column(nullable=false) private String company;
  @Column(nullable=false) private String location;
- private String type, level, salary, description, skills, eligibilityCriteria;
+ private String type, level, salary;
+ @Column(columnDefinition="TEXT") private String description;
+ @Column(columnDefinition="TEXT") private String skills;
+ @Column(columnDefinition="TEXT") private String eligibilityCriteria;
  @ManyToOne(optional=true) private User recruiter;
  private boolean active=true;
  private LocalDateTime createdAt=LocalDateTime.now();

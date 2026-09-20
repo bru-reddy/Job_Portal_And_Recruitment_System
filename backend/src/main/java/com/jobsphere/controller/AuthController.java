@@ -3,6 +3,7 @@ package com.jobsphere.controller;
 import com.jobsphere.dto.*;
 import com.jobsphere.model.*;
 import com.jobsphere.repository.UserRepository;
+import com.jobsphere.repository.JobRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,9 +15,10 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
  private final UserRepository users;
+ private final JobRepository jobs;
  private final PasswordEncoder encoder;
 
- public AuthController(UserRepository u,PasswordEncoder e){users=u;encoder=e;}
+ public AuthController(UserRepository u,JobRepository j,PasswordEncoder e){users=u;jobs=j;encoder=e;}
 
  @PostMapping("/register")
  public ResponseEntity<?> register(@RequestBody RegisterRequest r){
@@ -29,7 +31,11 @@ public class AuthController {
   if(users.findByEmail(email).isPresent()) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","This email is already registered. Please sign in instead."));
   User u=new User();
   u.setName(name);u.setEmail(email);u.setPassword(encoder.encode(r.password()));u.setRole(role);
-  try{return ResponseEntity.status(HttpStatus.CREATED).body(safe(users.save(u)));}
+  try{
+   User saved=users.save(u);
+   claimDemoJobs(saved);
+   return ResponseEntity.status(HttpStatus.CREATED).body(safe(saved));
+  }
   catch(DataIntegrityViolationException ex){return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","This email is already registered. Please sign in instead."));}
  }
 
@@ -42,9 +48,19 @@ public class AuthController {
   if(user.getRole()!=Role.CANDIDATE&&user.getRole()!=Role.RECRUITER) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","This account type is no longer supported"));
   if(r.role()!=null&&!r.role().isBlank()&&!user.getRole().name().equalsIgnoreCase(r.role()))
    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","This account is registered for a different role"));
+  claimDemoJobs(user);
   return ResponseEntity.ok(safe(user));
  }
 
+ private void claimDemoJobs(User recruiter){
+  if(recruiter==null||recruiter.getRole()!=Role.RECRUITER) return;
+  jobs.findAll().forEach(job -> {
+   if(job.getRecruiter()==null && job.isActive() && "JobSphere Demo".equalsIgnoreCase(job.getSourceName())){
+    job.setRecruiter(recruiter);
+    jobs.save(job);
+   }
+  });
+ }
  private Role parseRole(String r){
   if(r==null||r.isBlank()) return Role.CANDIDATE;
   try{return Role.valueOf(r.trim().toUpperCase(Locale.ROOT));}catch(Exception e){return Role.CANDIDATE;}

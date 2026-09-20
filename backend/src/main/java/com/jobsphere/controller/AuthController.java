@@ -13,7 +13,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
- private static final String COMPANY_CODE="1029";
  private final UserRepository users;
  private final PasswordEncoder encoder;
 
@@ -27,19 +26,9 @@ public class AuthController {
   if(r.password()==null||r.password().length()<6) return bad("Password must contain at least 6 characters");
   Role role=parseRole(r.role());
   if(role!=Role.CANDIDATE&&role!=Role.RECRUITER) return bad("Only Candidate and Recruiter accounts are supported");
-  if(role==Role.RECRUITER){
-   if(!COMPANY_CODE.equals(r.companyCode())) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","Invalid company authentication code"));
-   if(trim(r.companyName()).length()<2) return bad("Company name is required");
-  }
   if(users.findByEmail(email).isPresent()) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","This email is already registered. Please sign in instead."));
   User u=new User();
   u.setName(name);u.setEmail(email);u.setPassword(encoder.encode(r.password()));u.setRole(role);
-  if(role==Role.RECRUITER){
-   u.setCompanyName(trim(r.companyName()));
-   u.setCompanyWebsite(trim(r.companyWebsite()));
-   u.setCompanyIndustry(trim(r.companyIndustry()));
-   u.setCompanyDescription(trim(r.companyDescription()));
-  }
   try{return ResponseEntity.status(HttpStatus.CREATED).body(safe(users.save(u)));}
   catch(DataIntegrityViolationException ex){return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","This email is already registered. Please sign in instead."));}
  }
@@ -51,8 +40,6 @@ public class AuthController {
   var user=users.findByEmail(email).orElse(null);
   if(user==null||!encoder.matches(r.password(),user.getPassword())) return unauthorized();
   if(user.getRole()!=Role.CANDIDATE&&user.getRole()!=Role.RECRUITER) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","This account type is no longer supported"));
-  if(user.getRole()==Role.RECRUITER&&!COMPANY_CODE.equals(r.companyCode()))
-   return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","Company authentication code is required"));
   if(r.role()!=null&&!r.role().isBlank()&&!user.getRole().name().equalsIgnoreCase(r.role()))
    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","This account is registered for a different role"));
   return ResponseEntity.ok(safe(user));

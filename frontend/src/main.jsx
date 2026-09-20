@@ -4,6 +4,9 @@ import {ArrowRight,ArrowLeft,BriefcaseBusiness,Building2,CheckCircle2,ChevronRig
 import "./styles.css";
 import {api} from "./api";
 
+const DATA_RESET_VERSION="2";
+if(localStorage.getItem("jobsphereDataVersion")!==DATA_RESET_VERSION){localStorage.removeItem("jobsphereUser");localStorage.setItem("jobsphereDataVersion",DATA_RESET_VERSION);}
+
 const companies=[
 ["Microsoft","Technology & Cloud","M","https://www.microsoft.com/","https://careers.microsoft.com/"],
 ["Google","Technology & AI","G","https://www.google.com/","https://careers.google.com/jobs/"],

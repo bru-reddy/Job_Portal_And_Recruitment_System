@@ -68,3 +68,79 @@ body{background:linear-gradient(180deg,#f5f7ff 0%,#eef7f8 100%);color:var(--ink)
 footer{background:rgba(255,255,255,.88)}
 
 .skill-match{display:inline-flex!important;align-items:center!important;width:max-content;max-width:100%;padding:5px 8px!important;border-radius:7px;background:#f0f0ff;color:#5542d7!important;font-weight:750;border:1px solid #e4e0ff}.applicant-info{min-width:0;flex:1}.applicant-info>span{line-height:1.45}.applicant-decision .decision-btn{max-width:170px}.recruiter-dashboard .section-head{align-items:flex-end}
+
+/* Mobile workspace optimization — desktop UI unchanged */
+@media (max-width: 768px){
+ body{overflow-x:hidden}
+ .navbar{height:64px;padding:0 16px;gap:10px}
+ .brand-button{font-size:18px}
+ .brand-mark{width:30px;height:30px}
+ .nav-actions{gap:5px;min-width:0}
+ .user-chip{max-width:145px;padding-right:8px}
+ .user-chip span{width:28px;height:28px;flex:0 0 28px}
+ .mobile-menu{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px}
+ .mobile-nav{top:64px;padding:8px 16px;box-shadow:0 10px 24px #263b6418}
+ .mobile-nav button{padding:13px 8px;border-bottom:1px solid #edf1f6}
+ .inner-page,.section{padding:30px 16px}
+ .page-heading h1{font-size:34px;line-height:1.1}
+ .dashboard-head{gap:16px}
+ .dashboard-head .btn{width:100%}
+ .dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .dash-card{padding:16px}
+ .dash-card b{font-size:24px}
+ .workspace-card{padding:18px;margin:12px 0;border-radius:14px}
+ .workspace-card .section-head{gap:14px}
+ .workspace-card .section-head .btn{width:100%}
+ .job-admin-row{display:block;padding:16px 0}
+ .job-admin-row .tags{margin-top:10px}
+ .job-admin-row b{font-size:15px;line-height:1.35}
+ .quick-action-grid{grid-template-columns:1fr}
+ .quick-action{min-height:92px;padding:16px}
+ .applicant-filters{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+ .applicant-filters button{justify-content:space-between;padding:10px}
+ .applicant-row{display:grid;grid-template-columns:42px minmax(0,1fr);gap:10px;padding:18px 0}
+ .applicant-row>div:nth-child(2){display:block;min-width:0}
+ .applicant-info b{font-size:15px;line-height:1.3}
+ .applicant-info small,.applicant-info span{overflow-wrap:anywhere}
+ .applicant-decision{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+ .applicant-decision .decision-btn{max-width:none;width:100%;justify-content:center;padding:11px 8px}
+ .applicant-decision .status{grid-column:1/-1;justify-content:center;padding:9px}
+ .skill-match{width:auto!important;max-width:100%;display:inline-flex!important}
+ .application-row{display:block;padding:16px 0}
+ .application-row>.status{margin-top:10px}
+ .application-main{min-width:0}
+ .application-main>div{min-width:0}
+ .decision-message{max-width:none}
+ .form-card{padding:18px;border-radius:15px}
+ .form-heading{display:block}
+ .required-note{display:block;margin-top:8px}
+ .form-grid{grid-template-columns:1fr;gap:12px}
+ .post-card{margin:0}
+ .submit-btn{min-height:48px}
+ .application-layout{display:flex;flex-direction:column;gap:14px}
+ .application-summary{padding:20px}
+ .application-summary h1{font-size:27px}
+ .company-hero-card{padding:22px;flex-direction:column;align-items:flex-start}
+ .company-hero-card h1{font-size:28px}
+ .company-actions,.company-actions .btn{width:100%}
+ .job-grid,.company-directory,.resource-grid{grid-template-columns:1fr}
+ .job-card{padding:17px}
+ .card-footer{align-items:stretch;gap:12px;flex-direction:column}
+ .card-footer .apply{width:100%;justify-content:center}
+ .search-panel{margin-top:18px}
+ .compact-search{width:100%}
+ footer{padding:22px 16px;gap:10px}
+}
+@media (max-width: 420px){
+ .navbar{padding:0 10px}
+ .brand-button{font-size:16px}
+ .user-chip{max-width:112px;font-size:12px}
+ .user-chip span{width:25px;height:25px}
+ .dashboard-grid{grid-template-columns:1fr 1fr}
+ .dash-card{padding:13px}
+ .dash-card b{font-size:22px}
+ .applicant-filters{grid-template-columns:1fr}
+ .applicant-decision{grid-template-columns:1fr}
+ .applicant-decision .status{grid-column:auto}
+ .page-heading h1{font-size:30px}
+}

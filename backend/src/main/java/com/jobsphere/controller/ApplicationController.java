@@ -67,11 +67,6 @@ public class ApplicationController {
   return apps.findByJobCompanyIgnoreCaseOrderByAppliedAtDesc(company.getCompanyName());
  }
 
- @PatchMapping("/{id}/status")
- public ResponseEntity<?> status(@PathVariable Long id,@RequestParam ApplicationStatus status){
-  return apps.findById(id).map(a->{a.setStatus(status);return ResponseEntity.ok(apps.save(a));}).orElse(ResponseEntity.notFound().build());
- }
-
  private boolean blank(String s){return s==null||s.trim().isBlank();}
  private String trim(String s){return s==null?"":s.trim();}
  private ResponseEntity<?> bad(String m){return ResponseEntity.badRequest().body(Map.of("message",m));}

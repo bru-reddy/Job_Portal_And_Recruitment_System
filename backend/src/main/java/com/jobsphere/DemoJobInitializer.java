@@ -18,13 +18,12 @@ public class DemoJobInitializer {
    SystemResetMarkerRepository markerRepository
  ){
   return args -> {
-   if(markerRepository.existsById(1L)) return;
+   if(markerRepository.existsById(2L)) return;
 
    applications.deleteAllInBatch();
    jobs.deleteAllInBatch();
-   users.deleteAllInBatch();
 
-   markerRepository.save(new com.jobsphere.model.SystemResetMarker());
+   markerRepository.save(new com.jobsphere.model.SystemResetMarker(2L));
   };
  }
 }

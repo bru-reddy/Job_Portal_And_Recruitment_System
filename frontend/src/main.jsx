@@ -19,14 +19,6 @@ const companies=[
 ["Adobe","Digital Technology","A","https://www.adobe.com/","https://www.adobe.com/careers.html"]
 ].map(([name,industry,initial,site,careers])=>({name,industry,initial,site,careers}));
 
-const demoJobs=[
-{id:101,title:"Java Full Stack Developer",company:"Microsoft",location:"Hyderabad, India",type:"Full-time",level:"Entry-level",salary:"₹8–14 LPA",skills:"Java, Spring Boot, React, SQL, DSA",eligibilityCriteria:"B.Tech/B.E. CSE/IT or related degree; 0–2 years.",sourceName:"JobSphere Demo",sourceUrl:"https://careers.microsoft.com/"},
-{id:102,title:"Backend Software Engineer",company:"Amazon",location:"Hyderabad, India",type:"Full-time",level:"Entry-level",salary:"₹9–16 LPA",skills:"Java, Spring Boot, AWS, SQL, REST API",eligibilityCriteria:"Bachelor's degree in computer science or equivalent; 0–2 years.",sourceName:"JobSphere Demo",sourceUrl:"https://www.amazon.jobs/"},
-{id:103,title:"Software Engineer",company:"Google",location:"Bengaluru, India",type:"Full-time",level:"Early career",salary:"₹12–22 LPA",skills:"Java, Python, DSA, Git, Cloud",eligibilityCriteria:"Strong programming, algorithms and problem-solving fundamentals.",sourceName:"JobSphere Demo",sourceUrl:"https://careers.google.com/"},
-{id:104,title:"Associate Software Engineer",company:"Deloitte",location:"Hyderabad, India",type:"Full-time",level:"Entry-level",salary:"₹6–10 LPA",skills:"Java, SQL, Spring Boot, Git",eligibilityCriteria:"B.Tech/B.E. or equivalent; 0–2 years.",sourceName:"JobSphere Demo",sourceUrl:"https://www.deloitte.com/careers"},
-{id:105,title:"Frontend Developer",company:"Infosys",location:"Hyderabad, India",type:"Full-time",level:"Entry-level",salary:"₹5–9 LPA",skills:"JavaScript, React, HTML, CSS, Git",eligibilityCriteria:"B.Tech/B.E. or equivalent; strong web development fundamentals.",sourceName:"JobSphere Demo",sourceUrl:"https://www.infosys.com/careers.html"}
-];
-
 const tracks={
 Technology:[
 ["Java",Code2,"https://dev.java/learn/","https://www.hackerrank.com/domains/java","Core Java, OOP, collections, streams and modern Java."],
@@ -57,7 +49,7 @@ Design:[
 
 function companyByName(n){return companies.find(c=>c.name.toLowerCase()===String(n||"").toLowerCase())}
 function App(){
- const [screen,setScreen]=useState("home"),[menu,setMenu]=useState(false),[query,setQuery]=useState(""),[jobs,setJobs]=useState(demoJobs),[user,setUser]=useState(()=>{try{const u=JSON.parse(localStorage.getItem("jobsphereUser")||"null");return u&&(u.role==="CANDIDATE"||u.role==="RECRUITER")?u:null}catch{return null}}),[toast,setToast]=useState(null);
+ const [screen,setScreen]=useState("home"),[menu,setMenu]=useState(false),[query,setQuery]=useState(""),[jobs,setJobs]=useState([]),[user,setUser]=useState(()=>{try{const u=JSON.parse(localStorage.getItem("jobsphereUser")||"null");return u&&(u.role==="CANDIDATE"||u.role==="RECRUITER")?u:null}catch{return null}}),[toast,setToast]=useState(null);
  const [selectedJob,setSelectedJob]=useState(null),[selectedCompany,setSelectedCompany]=useState(null),[authMode,setAuthMode]=useState("login"),[authRole,setAuthRole]=useState("CANDIDATE"),[skillMode,setSkillMode]=useState(null),[skillCategory,setSkillCategory]=useState(null);
  useEffect(()=>{api.jobs().then(x=>x.length&&setJobs(x.map(j=>({...j,skills:Array.isArray(j.skills)?j.skills.join(", "):(j.skills||"")})))).catch(()=>{})},[]);
  const go=s=>{setScreen(s);setMenu(false);window.scrollTo(0,0)},notify=(m,t="success")=>{setToast({m,t});setTimeout(()=>setToast(null),3200)};

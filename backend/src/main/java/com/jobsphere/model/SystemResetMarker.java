@@ -9,5 +9,6 @@ public class SystemResetMarker {
  private Long id=1L;
 
  public SystemResetMarker() {}
+ public SystemResetMarker(Long id) { this.id=id; }
  public Long getId(){return id;}
 }

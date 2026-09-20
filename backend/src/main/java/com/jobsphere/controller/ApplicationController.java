@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -50,6 +51,7 @@ public class ApplicationController {
   ));
  }
 
+ @Transactional
  @PatchMapping("/{id}/status")
  public ResponseEntity<?> updateStatus(@PathVariable Long id,@RequestParam ApplicationStatus status,@RequestParam Long recruiterId){
   var recruiter=users.findById(recruiterId).orElse(null);
@@ -66,7 +68,12 @@ public class ApplicationController {
    return bad("Unsupported application status");
 
   application.setStatus(status);
-  return ResponseEntity.ok(apps.save(application));
+  Application saved=apps.saveAndFlush(application);
+  return ResponseEntity.ok(Map.of(
+   "id",saved.getId(),
+   "status",saved.getStatus().name(),
+   "message",status==ApplicationStatus.NOT_SELECTED?"Application marked as not selected":"Application approved for referral"
+  ));
  }
 
  @GetMapping("/candidate/{id}")

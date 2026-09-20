@@ -25,7 +25,8 @@ public class JobController {
    return ResponseEntity.badRequest().body("Title, company and location are required");
   Job j=new Job();
   j.setTitle(r.title().trim());j.setCompany(r.company().trim());j.setLocation(r.location().trim());j.setType(r.type());j.setLevel(r.level());
-  j.setSalary(r.salary());j.setDescription(r.description());j.setSkills(r.skills());j.setEligibilityCriteria(r.eligibilityCriteria());\n  j.setSourceName(r.sourceName());j.setSourceUrl(r.sourceUrl());
+  j.setSalary(r.salary());j.setDescription(r.description());j.setSkills(r.skills());j.setEligibilityCriteria(r.eligibilityCriteria());
+  j.setSourceName(r.sourceName());j.setSourceUrl(r.sourceUrl());
   j.setRecruiter(recruiter);
   return ResponseEntity.status(HttpStatus.CREATED).body(jobs.save(j));
  }

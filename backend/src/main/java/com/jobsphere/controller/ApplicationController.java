@@ -50,6 +50,25 @@ public class ApplicationController {
   ));
  }
 
+ @PatchMapping("/{id}/status")
+ public ResponseEntity<?> updateStatus(@PathVariable Long id,@RequestParam ApplicationStatus status,@RequestParam Long recruiterId){
+  var recruiter=users.findById(recruiterId).orElse(null);
+  if(recruiter==null||recruiter.getRole()!=Role.RECRUITER) return bad("Valid recruiter account required");
+
+  var application=apps.findById(id).orElse(null);
+  if(application==null) return ResponseEntity.notFound().build();
+
+  var job=application.getJob();
+  if(job.getRecruiter()==null||!recruiter.getId().equals(job.getRecruiter().getId()))
+   return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","You can only update applicants for your own jobs"));
+
+  if(status!=ApplicationStatus.HIRED&&status!=ApplicationStatus.REJECTED&&status!=ApplicationStatus.REVIEWING&&status!=ApplicationStatus.SHORTLISTED&&status!=ApplicationStatus.INTERVIEW)
+   return bad("Unsupported application status");
+
+  application.setStatus(status);
+  return ResponseEntity.ok(apps.save(application));
+ }
+
  @GetMapping("/candidate/{id}")
  public List<Application> candidate(@PathVariable Long id){return apps.findByCandidateIdOrderByAppliedAtDesc(id);}
 

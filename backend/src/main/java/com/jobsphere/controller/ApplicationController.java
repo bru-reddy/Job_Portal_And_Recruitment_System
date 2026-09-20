@@ -62,7 +62,7 @@ public class ApplicationController {
   if(job.getRecruiter()==null||!recruiter.getId().equals(job.getRecruiter().getId()))
    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","You can only update applicants for your own jobs"));
 
-  if(status!=ApplicationStatus.HIRED&&status!=ApplicationStatus.REJECTED&&status!=ApplicationStatus.REVIEWING&&status!=ApplicationStatus.SHORTLISTED&&status!=ApplicationStatus.INTERVIEW)
+  if(status!=ApplicationStatus.APPROVED_FOR_REFERRAL&&status!=ApplicationStatus.NOT_SELECTED&&status!=ApplicationStatus.REVIEWING)
    return bad("Unsupported application status");
 
   application.setStatus(status);

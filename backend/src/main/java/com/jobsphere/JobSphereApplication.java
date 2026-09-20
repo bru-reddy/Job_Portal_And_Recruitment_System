@@ -15,9 +15,17 @@ public class JobSphereApplication {
     @Bean
     CommandLineRunner ensureJobSchema(JdbcTemplate jdbc) {
         return args -> {
-            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_name varchar(500)");
-            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_url varchar(2000)");
-            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS eligibility_criteria varchar(1000)");
+            // Keep the jobs table compatible with older Render/PostgreSQL databases.
+            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_name TEXT");
+            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_url TEXT");
+            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS eligibility_criteria TEXT");
+            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS description TEXT");
+            jdbc.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS skills TEXT");
+            jdbc.execute("ALTER TABLE jobs ALTER COLUMN source_name TYPE TEXT");
+            jdbc.execute("ALTER TABLE jobs ALTER COLUMN source_url TYPE TEXT");
+            jdbc.execute("ALTER TABLE jobs ALTER COLUMN eligibility_criteria TYPE TEXT");
+            jdbc.execute("ALTER TABLE jobs ALTER COLUMN description TYPE TEXT");
+            jdbc.execute("ALTER TABLE jobs ALTER COLUMN skills TYPE TEXT");
             jdbc.execute("ALTER TABLE jobs ALTER COLUMN recruiter_id DROP NOT NULL");
         };
     }

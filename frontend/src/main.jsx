@@ -58,7 +58,7 @@ Design:[
 
 function companyByName(n){return companies.find(c=>c.name.toLowerCase()===String(n||"").toLowerCase())}
 function App(){
- const [screen,setScreen]=useState("home"),[menu,setMenu]=useState(false),[query,setQuery]=useState(""),[jobs,setJobs]=useState(demoJobs),[user,setUser]=useState(()=>JSON.parse(localStorage.getItem("jobsphereUser")||"null")),[toast,setToast]=useState(null);
+ const [screen,setScreen]=useState("home"),[menu,setMenu]=useState(false),[query,setQuery]=useState(""),[jobs,setJobs]=useState(demoJobs),[user,setUser]=useState(()=>{try{const u=JSON.parse(localStorage.getItem("jobsphereUser")||"null");return u&&(u.role==="CANDIDATE"||u.role==="RECRUITER")?u:null}catch{return null}}),[toast,setToast]=useState(null);
  const [selectedJob,setSelectedJob]=useState(null),[selectedCompany,setSelectedCompany]=useState(null),[authMode,setAuthMode]=useState("login"),[authRole,setAuthRole]=useState("CANDIDATE"),[skillMode,setSkillMode]=useState(null),[skillCategory,setSkillCategory]=useState(null);
  useEffect(()=>{api.jobs().then(x=>x.length&&setJobs(x.map(j=>({...j,skills:Array.isArray(j.skills)?j.skills.join(", "):(j.skills||"")})))).catch(()=>{})},[]);
  const go=s=>{setScreen(s);setMenu(false);window.scrollTo(0,0)},notify=(m,t="success")=>{setToast({m,t});setTimeout(()=>setToast(null),3200)};

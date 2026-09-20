@@ -105,7 +105,15 @@ function App(){
  const navigation=()=>!user?[["Find Jobs","jobs"],["Companies","companies"],["Build Your Skills","skills"]]:user.role==="CANDIDATE"?[["Find Jobs","jobs"],["Companies","companies"],["Build Your Skills","skills"],["Dashboard","dashboard"]]:[["Manage Jobs","recruiterJobs"],["Applicants","recruiterApplicants"],["Dashboard","dashboard"]];
  return <div className="app-shell">
   <header className="navbar"><button className="brand brand-button" onClick={()=>go("home")}><span className="brand-mark"><BriefcaseBusiness size={18}/></span>JobSphere</button><nav>{navigation().map(([x,s])=><button key={x} className={screen===s?"active":""} onClick={()=>go(s)}>{x}</button>)}</nav><div className="nav-actions">{user?<><button className="user-chip" onClick={()=>go("dashboard")}><span>{(user.name||"U")[0].toUpperCase()}</span>{user.role==="CANDIDATE"?user.name:(user.companyName||user.name)}</button><button className="btn ghost" onClick={logout}>Sign out</button></>:<><button className="btn ghost" onClick={()=>auth("login","CANDIDATE")}><LogIn size={15}/> Sign in</button><button className="btn primary" onClick={()=>auth("register","CANDIDATE")}>Create account <ArrowRight size={14}/></button></>}</div><button className="mobile-menu" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></header>
-  {menu&&<div className="mobile-nav">{navigation().map(([x,s])=><button key={x} onClick={()=>go(s)}>{x}</button>)}</div>}
+  {menu&&<div className="mobile-nav">
+  {navigation().map(([x,s])=><button key={x} onClick={()=>go(s)}>{x}</button>)}
+  <div className="mobile-nav-actions">
+   {user?<button className="mobile-nav-signout" onClick={logout}>Sign out</button>:<>
+    <button className="mobile-nav-signin" onClick={()=>auth("login","CANDIDATE")}>Sign in</button>
+    <button className="mobile-nav-create" onClick={()=>auth("register","CANDIDATE")}>Create account <ArrowRight size={14}/></button>
+   </>}
+  </div>
+ </div>}
   {screen==="home"&&<Home go={go} jobs={jobs} apply={apply} openCompany={openCompany}/>}
   {screen==="jobs"&&<Jobs jobs={jobs} query={query} setQuery={setQuery} apply={apply} openCompany={openCompany}/>}
   {screen==="companies"&&<Companies openCompany={openCompany} jobs={jobs}/>}

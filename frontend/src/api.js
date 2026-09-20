@@ -21,6 +21,7 @@ export const api={
  login:body=>request("/auth/login",{method:"POST",body:JSON.stringify(body)}),
  register:body=>request("/auth/register",{method:"POST",body:JSON.stringify(body)}),
  createJob:body=>request("/jobs",{method:"POST",body:JSON.stringify(body)}),
+ recruiterJobs:id=>request("/jobs/recruiter/"+id),
  applications:id=>request("/applications/candidate/"+id),
  recruiterApplications:id=>request("/applications/recruiter/"+id),
  companyApplications:id=>request("/applications/company/"+id),

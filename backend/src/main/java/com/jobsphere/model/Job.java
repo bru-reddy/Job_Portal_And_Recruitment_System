@@ -9,7 +9,7 @@ public class Job {
  @Column(nullable=false) private String title;
  @Column(nullable=false) private String company;
  @Column(nullable=false) private String location;
- private String type, level, salary, description, skills;
+ private String type, level, salary, description, skills, eligibilityCriteria;
  @ManyToOne(optional=true) private User recruiter;
  private boolean active=true;
  private LocalDateTime createdAt=LocalDateTime.now();
@@ -23,6 +23,7 @@ public class Job {
  public String getSalary(){return salary;} public void setSalary(String v){salary=v;}
  public String getDescription(){return description;} public void setDescription(String v){description=v;}
  public String getSkills(){return skills;} public void setSkills(String v){skills=v;}
+ public String getEligibilityCriteria(){return eligibilityCriteria;} public void setEligibilityCriteria(String v){eligibilityCriteria=v;}
  public User getRecruiter(){return recruiter;} public void setRecruiter(User v){recruiter=v;}
  public boolean isActive(){return active;} public void setActive(boolean v){active=v;}
  public LocalDateTime getCreatedAt(){return createdAt;}

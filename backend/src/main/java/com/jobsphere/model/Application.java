@@ -1,10 +1,7 @@
 package com.jobsphere.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name="applications", uniqueConstraints=@UniqueConstraint(columnNames={"job_id","candidate_id"}))
@@ -14,7 +11,6 @@ public class Application {
  @ManyToOne(optional=false) private User candidate;
  @Enumerated(EnumType.STRING) private ApplicationStatus status=ApplicationStatus.APPLIED;
  private LocalDateTime appliedAt=LocalDateTime.now();
-
  private String applicantName;
  private String applicantEmail;
  private String applicantPhone;
@@ -22,13 +18,6 @@ public class Application {
  private String experience;
  @Column(length=3000) private String skills;
  @Column(length=6000) private String coverLetter;
- private String resumeFileName;
- private String resumeContentType;
-
- @JdbcTypeCode(SqlTypes.VARBINARY)
- @Basic(fetch=FetchType.LAZY)
- @JsonIgnore
- private byte[] resumeData;
 
  public Application() {}
  public Long getId(){return id;}
@@ -43,7 +32,4 @@ public class Application {
  public String getExperience(){return experience;} public void setExperience(String v){experience=v;}
  public String getSkills(){return skills;} public void setSkills(String v){skills=v;}
  public String getCoverLetter(){return coverLetter;} public void setCoverLetter(String v){coverLetter=v;}
- public String getResumeFileName(){return resumeFileName;} public void setResumeFileName(String v){resumeFileName=v;}
- public String getResumeContentType(){return resumeContentType;} public void setResumeContentType(String v){resumeContentType=v;}
- public byte[] getResumeData(){return resumeData;} public void setResumeData(byte[] v){resumeData=v;}
 }

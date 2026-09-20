@@ -7,5 +7,6 @@ import java.util.List;
 public interface JobRepository extends JpaRepository<Job,Long>{
  List<Job> findByActiveTrueOrderByCreatedAtDesc();
  List<Job> findByActiveTrueAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title);
+ List<Job> findByRecruiterIdOrderByCreatedAtDesc(Long recruiterId);
  boolean existsByCompanyIgnoreCaseAndTitleIgnoreCase(String company,String title);
 }

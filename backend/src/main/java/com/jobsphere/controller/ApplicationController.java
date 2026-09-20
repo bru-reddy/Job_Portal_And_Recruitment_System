@@ -20,7 +20,8 @@ public class ApplicationController {
  @PostMapping(consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
  public ResponseEntity<?> apply(
    @RequestParam Long jobId,
-   @RequestParam Long candidateId,
+   @RequestParam(required=false) Long candidateId,
+   @RequestParam(required=false,defaultValue="") String candidateEmail,
    @RequestParam String applicantName,
    @RequestParam String applicantEmail,
    @RequestParam(required=false,defaultValue="") String applicantPhone,
@@ -30,10 +31,19 @@ public class ApplicationController {
    @RequestParam(required=false,defaultValue="") String coverLetter,
    @RequestPart("resume") MultipartFile resume
  ) throws IOException {
-  if(apps.existsByJobIdAndCandidateId(jobId,candidateId)) return ResponseEntity.badRequest().body(java.util.Map.of("message","You have already applied for this role"));
   var job=jobs.findById(jobId).orElse(null);
-  var user=users.findById(candidateId).orElse(null);
-  if(job==null||user==null||user.getRole()!=Role.CANDIDATE) return ResponseEntity.badRequest().body(java.util.Map.of("message","Valid job and candidate required"));
+  if(job==null) return ResponseEntity.badRequest().body(java.util.Map.of("message","The selected job could not be found. Please return to Find Jobs and select the role again."));
+
+  // Prefer the stored user id, but fall back to the authenticated candidate email.
+  // This also recovers gracefully when an older browser session has a user object
+  // created before the current login response included the database id.
+  var user=candidateId==null?null:users.findById(candidateId).orElse(null);
+  if((user==null||user.getRole()!=Role.CANDIDATE)&&candidateEmail!=null&&!candidateEmail.isBlank()){
+   user=users.findByEmail(candidateEmail.trim().toLowerCase()).orElse(null);
+  }
+  if(user==null||user.getRole()!=Role.CANDIDATE) return ResponseEntity.badRequest().body(java.util.Map.of("message","Valid candidate account required. Please sign out and sign in again before applying."));
+  if(apps.existsByJobIdAndCandidateId(jobId,user.getId())) return ResponseEntity.badRequest().body(java.util.Map.of("message","You have already applied for this role"));
+
   if(resume==null||resume.isEmpty()) return ResponseEntity.badRequest().body(java.util.Map.of("message","Please upload your resume as a PDF"));
   String contentType=resume.getContentType()==null?"":resume.getContentType().toLowerCase();
   String filename=resume.getOriginalFilename()==null?"":resume.getOriginalFilename().toLowerCase();
@@ -65,7 +75,7 @@ public class ApplicationController {
  public ResponseEntity<byte[]> resume(@PathVariable Long id){
   return apps.findById(id).map(a->ResponseEntity.ok()
     .contentType(MediaType.APPLICATION_PDF)
-    .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+(a.getResumeFileName()==null?"resume.pdf":a.getResumeFileName().replace("\"",""))+"\"")
+    .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" +(a.getResumeFileName()==null?"resume.pdf":a.getResumeFileName().replace("\"",""))+"\"")
     .body(a.getResumeData())
   ).orElse(ResponseEntity.notFound().build());
  }

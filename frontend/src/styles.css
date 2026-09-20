@@ -66,3 +66,5 @@ body{background:linear-gradient(180deg,#f5f7ff 0%,#eef7f8 100%);color:var(--ink)
 .form-card{border-color:#dce3f1}
 .field input:focus,.field textarea:focus{border-color:#7b6df0;box-shadow:0 0 0 3px #6d4aff12}
 footer{background:rgba(255,255,255,.88)}
+
+.skill-match{display:inline-flex!important;align-items:center!important;width:max-content;max-width:100%;padding:5px 8px!important;border-radius:7px;background:#f0f0ff;color:#5542d7!important;font-weight:750;border:1px solid #e4e0ff}.applicant-info{min-width:0;flex:1}.applicant-info>span{line-height:1.45}.applicant-decision .decision-btn{max-width:170px}.recruiter-dashboard .section-head{align-items:flex-end}

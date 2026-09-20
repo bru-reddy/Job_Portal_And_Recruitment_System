@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -58,7 +59,14 @@ public class ApplicationController {
   a.setResumeFileName(resume.getOriginalFilename());
   a.setResumeContentType("application/pdf");
   a.setResumeData(resume.getBytes());
-  return ResponseEntity.status(HttpStatus.CREATED).body(apps.save(a));
+  Application saved=apps.save(a);
+  // Return a small response DTO instead of serializing the full JPA graph.
+  // This avoids lazy-proxy/relationship serialization errors after the transaction closes.
+  return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+    "id",saved.getId(),
+    "message","Application submitted successfully",
+    "status",saved.getStatus().name()
+  ));
  }
 
  @GetMapping("/candidate/{id}")

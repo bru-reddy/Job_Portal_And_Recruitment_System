@@ -67,11 +67,11 @@ public class ApplicationController {
   if(status!=ApplicationStatus.APPROVED_FOR_REFERRAL&&status!=ApplicationStatus.NOT_SELECTED&&status!=ApplicationStatus.REVIEWING)
    return bad("Unsupported application status");
 
-  application.setStatus(status);
-  Application saved=apps.saveAndFlush(application);
+  int updated=apps.updateStatus(id,status);
+  if(updated!=1) return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message","Application status could not be updated"));
   return ResponseEntity.ok(Map.of(
-   "id",saved.getId(),
-   "status",saved.getStatus().name(),
+   "id",id,
+   "status",status.name(),
    "message",status==ApplicationStatus.NOT_SELECTED?"Application marked as not selected":"Application approved for referral"
   ));
  }

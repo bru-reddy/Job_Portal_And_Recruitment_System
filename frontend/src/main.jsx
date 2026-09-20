@@ -78,6 +78,11 @@ function App(){
   if(user.role==="CANDIDATE"&&!candidateScreens.includes(screen))setScreen("dashboard");
  },[user,screen]);
  const go=s=>{setScreen(s);setMenu(false);window.scrollTo(0,0)},notify=(m,t="success")=>{setToast({m,t});setTimeout(()=>setToast(null),3200)};
+ useEffect(()=>{
+  const handler=e=>notify(e.detail?.message||"Updated",e.detail?.type||"success");
+  window.addEventListener("jobsphere-toast",handler);
+  return()=>window.removeEventListener("jobsphere-toast",handler);
+ },[]);
  const auth=(m,r)=>{setAuthMode(m);setAuthRole(r);go("auth")};
  const logout=()=>{localStorage.removeItem("jobsphereUser");setUser(null);notify("Signed out");go("home")};
  const apply=job=>{if(!user){auth("login","CANDIDATE");return}if(user.role!=="CANDIDATE"){notify("Only candidate accounts can apply","error");return}setSelectedJob(job);go("apply")};
@@ -170,13 +175,28 @@ const load=()=>{setLoading(true);api.recruiterApplications(user.id).then(x=>setA
 useEffect(load,[user.id]);
 const counts={ALL:apps.length,PENDING:apps.filter(a=>!["APPROVED_FOR_REFERRAL","NOT_SELECTED"].includes(a.status)).length,APPROVED_FOR_REFERRAL:apps.filter(a=>a.status==="APPROVED_FOR_REFERRAL").length,NOT_SELECTED:apps.filter(a=>a.status==="NOT_SELECTED").length};
 const visible=apps.filter(a=>filter==="ALL"?true:filter==="PENDING"?!["APPROVED_FOR_REFERRAL","NOT_SELECTED"].includes(a.status):a.status===filter);
-const update=async(id,status)=>{await api.updateApplicationStatus(id,status,user.id);await load()};
+const update=async(id,status)=>{
+ try{
+  await api.updateApplicationStatus(id,status,user.id);
+  await load();
+ }catch(err){
+  setApps(prev=>prev);
+  throw err;
+ }
+};
 return <main className="inner-page recruiter-applicants"><div className="page-heading"><div className="kicker">RECRUITMENT PARTNER · APPLICANT MANAGEMENT</div><h1>Applicants</h1><p>Review candidate submissions and keep accepted and rejected decisions stored with each application.</p></div>
 <div className="workspace-card"><div className="section-head"><div><div className="kicker">CANDIDATE SUBMISSIONS</div><h2>Application pipeline</h2></div><span className="company-code-badge">{apps.length} TOTAL</span></div>
 <div className="applicant-filters">{[["ALL","All"],["PENDING","Pending"],["APPROVED_FOR_REFERRAL","Approved for Referral"],["NOT_SELECTED","Not Selected"]].map(([value,label])=><button key={value} className={filter===value?"selected":""} onClick={()=>setFilter(value)}>{label}<span>{counts[value]}</span></button>)}</div>
 {loading?<div className="empty-inline">Loading applicants...</div>:visible.length?visible.map(a=><Applicant key={a.id} a={a} onStatus={update}/>):<div className="empty-inline">No applicants in this section.</div>}</div></main>}
 
-function Applicant({a,onStatus}){const [busy,setBusy]=useState(false);const status=a.status||"APPLIED";const jobSkills=String(a.job?.skills||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);const candidateSkills=String(a.skills||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);const matched=jobSkills.filter(s=>candidateSkills.some(c=>c===s||c.includes(s)||s.includes(c)));const matchPct=jobSkills.length?Math.round(matched.length/jobSkills.length*100):0;const decide=async next=>{setBusy(true);try{await onStatus(a.id,next)}finally{setBusy(false)}};return <div className="applicant-row"><div className="avatar">{(a.applicantName||"?")[0]}</div><div className="applicant-info"><b>{a.applicantName}</b><small>{a.job?.title} · {a.applicantEmail}</small><span>{a.education} · {a.experience||"Experience not specified"}</span><span><strong>Skills:</strong> {a.skills}</span><span className="skill-match"><strong>Skill relevance:</strong> {matchPct}% · {matched.length}/{jobSkills.length} required skills matched</span></div><div className="applicant-decision">{status==="APPROVED_FOR_REFERRAL"?<span className="status status-accepted"><CheckCircle2 size={13}/> APPROVED FOR REFERRAL</span>:status==="NOT_SELECTED"?<span className="status status-rejected"><X size={13}/> NOT SELECTED</span>:<><button className="decision-btn accept" disabled={busy} onClick={()=>decide("APPROVED_FOR_REFERRAL")}><CheckCircle2 size={14}/> Accept</button><button className="decision-btn reject" disabled={busy} onClick={()=>decide("NOT_SELECTED")}><X size={14}/> Reject</button></>}</div></div>}
+function Applicant({a,onStatus}){const [busy,setBusy]=useState(false);const status=a.status||"APPLIED";const jobSkills=String(a.job?.skills||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);const candidateSkills=String(a.skills||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);const matched=jobSkills.filter(s=>candidateSkills.some(c=>c===s||c.includes(s)||s.includes(c)));const matchPct=jobSkills.length?Math.round(matched.length/jobSkills.length*100):0;const decide=async next=>{
+ setBusy(true);
+ try{
+  await onStatus(a.id,next);
+ }catch(err){
+  window.dispatchEvent(new CustomEvent("jobsphere-toast",{detail:{message:err.message||"Unable to update application",type:"error"}}));
+ }finally{setBusy(false)}
+};return <div className="applicant-row"><div className="avatar">{(a.applicantName||"?")[0]}</div><div className="applicant-info"><b>{a.applicantName}</b><small>{a.job?.title} · {a.applicantEmail}</small><span>{a.education} · {a.experience||"Experience not specified"}</span><span><strong>Skills:</strong> {a.skills}</span><span className="skill-match"><strong>Skill relevance:</strong> {matchPct}% · {matched.length}/{jobSkills.length} required skills matched</span></div><div className="applicant-decision">{status==="APPROVED_FOR_REFERRAL"?<span className="status status-accepted"><CheckCircle2 size={13}/> APPROVED FOR REFERRAL</span>:status==="NOT_SELECTED"?<span className="status status-rejected"><X size={13}/> NOT SELECTED</span>:<><button className="decision-btn accept" disabled={busy} onClick={()=>decide("APPROVED_FOR_REFERRAL")}><CheckCircle2 size={14}/> Accept</button><button className="decision-btn reject" disabled={busy} onClick={()=>decide("NOT_SELECTED")}><X size={14}/> Reject</button></>}</div></div>}
 
 function PostJob({user,go,notify}){const [f,setF]=useState({title:"",company:user?.companyName||"",location:"",type:"Full-time",level:"Entry-level",salary:"",skills:"",eligibilityCriteria:"",description:"",sourceName:"",sourceUrl:""}),[busy,setBusy]=useState(false);const ch=e=>setF({...f,[e.target.name]:e.target.value});const submit=async e=>{e.preventDefault();setBusy(true);try{await api.createJob({...f,recruiterId:user.id});notify("Job published");go("dashboard")}catch(x){notify(x.message,"error")}finally{setBusy(false)}};return <main className="auth-page"><form className="form-card post-card" onSubmit={submit}><div className="form-heading"><div><div className="kicker">RECRUITMENT PARTNER WORKSPACE</div><h2>Post a new job</h2><p>Define the role, skills and eligibility criteria.</p></div></div><div className="form-grid"><Field label="Job title *" name="title" value={f.title} onChange={ch} required/><Field label="Company *" name="company" value={f.company} onChange={ch} required/><Field label="Location *" name="location" value={f.location} onChange={ch} required/><Field label="Job type" name="type" value={f.type} onChange={ch}/><Field label="Experience level" name="level" value={f.level} onChange={ch}/><Field label="Salary range" name="salary" value={f.salary} onChange={ch}/><Field label="Required skills *" name="skills" value={f.skills} onChange={ch} placeholder="Java, Spring Boot, SQL" required/><Field label="Eligibility criteria *" name="eligibilityCriteria" value={f.eligibilityCriteria} onChange={ch} placeholder="B.Tech CSE, 0–2 years..." required/><Field label="Job source *" name="sourceName" value={f.sourceName} onChange={ch} placeholder="LinkedIn, company careers..." required/><Field label="Source URL" name="sourceUrl" value={f.sourceUrl} onChange={ch} placeholder="https://..." type="url"/></div><label className="field full-field">Job description<textarea name="description" value={f.description} onChange={ch} rows="6"/></label><button className="btn primary full submit-btn" disabled={busy}>{busy?"Publishing...":"Publish job"} <ArrowRight size={15}/></button></form></main>}
 

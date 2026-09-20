@@ -51,10 +51,23 @@ Design:[
 };
 
 function companyByName(n){return companies.find(c=>c.name.toLowerCase()===String(n||"").toLowerCase())}
+function getStoredUser(){
+ try{
+  const u=JSON.parse(localStorage.getItem("jobsphereUser")||"null");
+  return u&&(u.role==="CANDIDATE"||u.role==="RECRUITER")?u:null;
+ }catch{return null}
+}
 function App(){
- const [screen,setScreen]=useState("home"),[menu,setMenu]=useState(false),[query,setQuery]=useState(""),[jobs,setJobs]=useState([]),[user,setUser]=useState(()=>{try{const u=JSON.parse(localStorage.getItem("jobsphereUser")||"null");return u&&(u.role==="CANDIDATE"||u.role==="RECRUITER")?u:null}catch{return null}}),[toast,setToast]=useState(null);
+ const [screen,setScreen]=useState(()=>getStoredUser()?.role==="RECRUITER"?"dashboard":"home"),[menu,setMenu]=useState(false),[query,setQuery]=useState(""),[jobs,setJobs]=useState([]),[user,setUser]=useState(()=>{try{const u=JSON.parse(localStorage.getItem("jobsphereUser")||"null");return u&&(u.role==="CANDIDATE"||u.role==="RECRUITER")?u:null}catch{return null}}),[toast,setToast]=useState(null);
  const [selectedJob,setSelectedJob]=useState(null),[selectedCompany,setSelectedCompany]=useState(null),[authMode,setAuthMode]=useState("login"),[authRole,setAuthRole]=useState("CANDIDATE"),[skillMode,setSkillMode]=useState(null),[skillCategory,setSkillCategory]=useState(null);
  useEffect(()=>{api.jobs().then(x=>x.length&&setJobs(x.map(j=>({...j,skills:Array.isArray(j.skills)?j.skills.join(", "):(j.skills||"")})))).catch(()=>{})},[]);
+ useEffect(()=>{
+  if(!user)return;
+  const recruiterScreens=["dashboard","recruiterJobs","recruiterApplicants","post"];
+  const candidateScreens=["home","jobs","companies","companyProfile","apply","dashboard","skills","auth"];
+  if(user.role==="RECRUITER"&&!recruiterScreens.includes(screen))setScreen("dashboard");
+  if(user.role==="CANDIDATE"&&!candidateScreens.includes(screen))setScreen("dashboard");
+ },[user,screen]);
  const go=s=>{setScreen(s);setMenu(false);window.scrollTo(0,0)},notify=(m,t="success")=>{setToast({m,t});setTimeout(()=>setToast(null),3200)};
  const auth=(m,r)=>{setAuthMode(m);setAuthRole(r);go("auth")};
  const logout=()=>{localStorage.removeItem("jobsphereUser");setUser(null);notify("Signed out");go("home")};

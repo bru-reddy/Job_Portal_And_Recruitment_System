@@ -60,7 +60,16 @@ function getStoredUser(){
 function App(){
  const [screen,setScreen]=useState(()=>getStoredUser()?.role==="RECRUITER"?"dashboard":"home"),[menu,setMenu]=useState(false),[query,setQuery]=useState(""),[jobs,setJobs]=useState([]),[user,setUser]=useState(()=>{try{const u=JSON.parse(localStorage.getItem("jobsphereUser")||"null");return u&&(u.role==="CANDIDATE"||u.role==="RECRUITER")?u:null}catch{return null}}),[toast,setToast]=useState(null);
  const [selectedJob,setSelectedJob]=useState(null),[selectedCompany,setSelectedCompany]=useState(null),[authMode,setAuthMode]=useState("login"),[authRole,setAuthRole]=useState("CANDIDATE"),[skillMode,setSkillMode]=useState(null),[skillCategory,setSkillCategory]=useState(null);
- useEffect(()=>{api.jobs().then(x=>x.length&&setJobs(x.map(j=>({...j,skills:Array.isArray(j.skills)?j.skills.join(", "):(j.skills||"")})))).catch(()=>{})},[]);
+ const loadJobs=async()=>{
+  try{
+   const x=await api.jobs();
+   const list=Array.isArray(x)?x:(Array.isArray(x?.jobs)?x.jobs:[]);
+   setJobs(list.map(j=>({...j,skills:Array.isArray(j.skills)?j.skills.join(", "):(j.skills||"")})));
+  }catch{
+   setJobs([]);
+  }
+ };
+ useEffect(()=>{loadJobs()},[user?.id,screen]);
  useEffect(()=>{
   if(!user)return;
   const recruiterScreens=["dashboard","recruiterJobs","recruiterApplicants","post"];
@@ -79,7 +88,7 @@ function App(){
   {menu&&<div className="mobile-nav">{navigation().map(([x,s])=><button key={x} onClick={()=>go(s)}>{x}</button>)}</div>}
   {screen==="home"&&<Home go={go} jobs={jobs} apply={apply} openCompany={openCompany}/>}
   {screen==="jobs"&&<Jobs jobs={jobs} query={query} setQuery={setQuery} apply={apply} openCompany={openCompany}/>}
-  {screen==="companies"&&<Companies openCompany={openCompany}/>}
+  {screen==="companies"&&<Companies openCompany={openCompany} jobs={jobs}/>}
   {screen==="companyProfile"&&<CompanyProfile company={selectedCompany} jobs={jobs} apply={apply} go={go}/>}
   {screen==="apply"&&<ApplicationForm job={selectedJob} user={user} go={go} notify={notify}/>}
   {screen==="dashboard"&&<Dashboard user={user} go={go} jobs={jobs} apply={apply}/>}
@@ -100,7 +109,7 @@ function JobCard({job,apply,openCompany}){return <article className="job-card"><
 
 function Jobs({jobs,query,setQuery,apply,openCompany}){const list=useMemo(()=>jobs.filter(j=>!query||[j.title,j.company,j.skills,j.location].join(" ").toLowerCase().includes(query.toLowerCase())),[jobs,query]);return <main className="inner-page"><div className="page-heading"><div className="kicker">JOB DISCOVERY</div><h1>Find Jobs</h1><p>Search by role, company, location or skill.</p></div><div className="search-panel compact-search"><div className="search-field"><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search jobs, companies or skills"/></div></div><div className="job-grid">{list.map(j=><JobCard key={j.id} job={j} apply={()=>apply(j)} openCompany={openCompany}/>)}</div></main>}
 
-function Companies({openCompany}){return <main className="inner-page"><div className="page-heading"><div className="kicker">COMPANY DIRECTORY</div><h1>Companies</h1><p>Public company profiles are informational. JobSphere does not represent these organizations.</p></div><div className="company-directory">{companies.map(c=><button className="directory-card" key={c.name} onClick={()=>openCompany(c.name)}><div className="directory-top"><CompanyLogo name={c.name}/><span>{c.industry}</span></div><h3>{c.name}</h3><p>Explore company information and simulated JobSphere roles.</p><span className="directory-link">View portfolio <ArrowRight size={14}/></span></button>)}</div></main>}
+function Companies({openCompany,jobs=[]}){const posted=[...new Set(jobs.map(j=>String(j.company||"").trim()).filter(Boolean))].map(name=>({name,industry:"Recruiter-posted opportunities",initial:name[0].toUpperCase()}));return <main className="inner-page"><div className="page-heading"><div className="kicker">COMPANY DIRECTORY</div><h1>Companies</h1><p>Companies shown here are taken directly from active jobs posted on JobSphere.</p></div>{posted.length?<div className="company-directory">{posted.map(c=><button className="directory-card" key={c.name} onClick={()=>openCompany(c.name)}><div className="directory-top"><CompanyLogo name={c.name}/><span>{c.industry}</span></div><h3>{c.name}</h3><p>View the active roles posted for this company on JobSphere.</p><span className="directory-link">View jobs <ArrowRight size={14}/></span></button>)}</div>:<div className="empty-state"><Building2/><h2>No companies yet</h2><p>Companies will appear here after a recruiter publishes a job.</p></div>}</main>}
 
 function CompanyProfile({company,jobs,apply,go}){if(!company)return null;const list=jobs.filter(j=>String(j.company).toLowerCase()===company.name.toLowerCase());return <main className="inner-page"><button className="back-btn" onClick={()=>go("companies")}><ArrowLeft size={15}/> Back</button><section className="company-hero-card"><div className="company-hero-logo"><CompanyLogo name={company.name}/></div><div><div className="kicker">COMPANY PROFILE</div><h1>{company.name}</h1><p>{company.industry}</p><div className="company-actions"><a className="btn ghost" href={company.site} target="_blank" rel="noreferrer"><Globe size={14}/> Website</a><a className="btn primary" href={company.careers} target="_blank" rel="noreferrer">Official careers <ExternalLink size={13}/></a></div></div></section><section className="workspace-card"><div className="kicker">SIMULATED OPENINGS</div><h2>Roles shown in JobSphere</h2><p className="muted">These roles are simulated and are not submitted to the real company.</p><div className="job-grid">{list.map(j=><JobCard key={j.id} job={j} apply={()=>apply(j)} openCompany={()=>{}}/>)}</div></section></main>}
 

@@ -144,3 +144,17 @@ footer{background:rgba(255,255,255,.88)}
  .applicant-decision .status{grid-column:auto}
  .page-heading h1{font-size:30px}
 }
+
+/* Mobile navigation actions */
+.mobile-nav-actions{display:flex;gap:8px;padding:12px 8px 6px;margin-top:4px;border-top:1px solid #edf1f6}
+.mobile-nav-actions button{flex:1;min-height:44px;border-radius:10px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.mobile-nav-signin,.mobile-nav-signout{border:1px solid #d8e2ef;background:#fff;color:#18375e}
+.mobile-nav-create{border:1px solid transparent;background:linear-gradient(135deg,#3157e8,#7048ee);color:#fff;box-shadow:0 7px 16px #3157e82b}
+.mobile-nav-signout{color:#c13e3e;border-color:#f0caca;background:#fff7f7}
+@media (max-width:768px){
+ .nav-actions .btn{display:none}
+ .mobile-nav{max-height:calc(100vh - 64px);overflow-y:auto}
+}
+@media (max-width:420px){
+ .mobile-nav-actions{flex-direction:column}
+}

@@ -34,6 +34,12 @@ public class SecurityConfig {
    .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
    .sessionFixation(f -> f.migrateSession())
   );
+  http.headers(h -> h.addHeaderWriter((request, response) -> {
+   String cookie = response.getHeader("Set-Cookie");
+   if (cookie != null && cookie.contains("JSESSIONID") && !cookie.toLowerCase().contains("samesite")) {
+    response.setHeader("Set-Cookie", cookie + "; SameSite=None; Secure; HttpOnly");
+   }
+  }));
   http.formLogin(c -> c.disable()).httpBasic(c -> c.disable());
   http.authorizeHttpRequests(a -> a
    .requestMatchers("/api/auth/**", "/api/health", "/api/jobs", "/api/jobs/*").permitAll()

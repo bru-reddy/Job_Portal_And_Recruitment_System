@@ -64,8 +64,12 @@ public class ApplicationController {
  @PatchMapping("/{id}/status")
  public ResponseEntity<?> updateStatus(@PathVariable Long id,
                                        @RequestParam ApplicationStatus status,
-                                       @RequestParam Long recruiterId) {
-  var recruiter = users.findById(recruiterId).orElse(null);
+                                       @RequestParam Long recruiterId,
+                                       HttpSession session) {
+  Long signedInUserId = (Long) session.getAttribute("jobsphereUserId");
+  if (signedInUserId == null) return unauthorized();
+  if (!signedInUserId.equals(recruiterId)) return forbidden();
+  var recruiter = users.findById(signedInUserId).orElse(null);
   if (recruiter == null || recruiter.getRole() != Role.RECRUITER) return bad("Valid recruiter account required");
   var application = apps.findById(id).orElse(null);
   if (application == null) return ResponseEntity.notFound().build();

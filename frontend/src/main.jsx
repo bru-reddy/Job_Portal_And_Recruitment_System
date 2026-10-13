@@ -83,7 +83,7 @@ function App(){
   window.addEventListener("jobsphere-toast",handler);
   return()=>window.removeEventListener("jobsphere-toast",handler);
  },[]);
- const auth=(m,r)=>{setAuthMode(m);setAuthRole(r);go("auth")};
+ const auth=(m,r)=>{setAuthMode(m);setAuthRole(r);setScreen("auth");setMenu(false);window.scrollTo(0,0)};
  const logout=async()=>{try{await api.logout()}catch{}localStorage.removeItem("jobsphereUser");setUser(null);notify("Signed out");go("home")};
  const apply=job=>{if(!user){setSelectedJob(job);setAuthMode("login");setAuthRole("CANDIDATE");setScreen("auth");setMenu(false);window.scrollTo(0,0);notify("Sign in to your candidate account before applying","error");return}if(user.role!=="CANDIDATE"){notify("Only candidate accounts can apply","error");return}setSelectedJob(job);go("apply")};
  const openCompany=n=>{

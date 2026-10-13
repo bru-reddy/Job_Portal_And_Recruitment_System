@@ -34,19 +34,6 @@ public class SecurityConfig {
    .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
    .sessionFixation(f -> f.migrateSession())
   );
-  http.formLogin(cfg -> cfg.disable()).httpBasic(cfg -> cfg.disable());
-  // Spring's default servlet cookie is Lax. Separate hosted frontend and API
-  // origins need SameSite=None + Secure for cross-origin credentialed fetches.
-  http.addFilterAfter(new org.springframework.web.filter.OncePerRequestFilter() {
-   @Override
-   protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
-                                   jakarta.servlet.http.HttpServletResponse response,
-                                   jakarta.servlet.FilterChain chain)
-                                   throws jakarta.servlet.ServletException, java.io.IOException {
-    chain.doFilter(request, response);
-    var context = org.springframework.security.core.context.SecurityContextHolder.getContext();
-   }
-  }, org.springframework.security.web.context.SecurityContextHolderFilter.class);
   http.formLogin(c -> c.disable()).httpBasic(c -> c.disable());
   http.authorizeHttpRequests(a -> a
    .requestMatchers("/api/auth/**", "/api/health", "/api/jobs", "/api/jobs/*").permitAll()

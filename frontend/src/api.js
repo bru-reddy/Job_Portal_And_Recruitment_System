@@ -4,7 +4,12 @@ async function request(path,options={}){
  const controller=new AbortController();
  const timer=setTimeout(()=>controller.abort(),90000);
  try{
-  const res=await fetch(BASE+"/api"+path,{...options,signal:controller.signal,headers:{"Content-Type":"application/json",...(options.headers||{})}});
+  const res=await fetch(BASE+"/api"+path,{
+   credentials:"include",
+   ...options,
+   signal:controller.signal,
+   headers:{"Content-Type":"application/json",...(options.headers||{})}
+  });
   const text=await res.text();let data={};
   try{data=text?JSON.parse(text):{};}catch{data={message:text};}
   if(!res.ok) throw new Error(data.message||data.error||("Request failed ("+res.status+")"));
@@ -20,6 +25,7 @@ export const api={
  jobs:(search="")=>request("/jobs"+(search?"?search="+encodeURIComponent(search):"")),
  login:body=>request("/auth/login",{method:"POST",body:JSON.stringify(body)}),
  register:body=>request("/auth/register",{method:"POST",body:JSON.stringify(body)}),
+ logout:()=>request("/auth/logout",{method:"POST"}),
  createJob:body=>request("/jobs",{method:"POST",body:JSON.stringify(body)}),
  recruiterJobs:id=>request("/jobs/recruiter/"+id),
  applications:id=>request("/applications/candidate/"+id),

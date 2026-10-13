@@ -4,6 +4,7 @@ import com.jobsphere.dto.*;
 import com.jobsphere.model.*;
 import com.jobsphere.repository.UserRepository;
 import com.jobsphere.repository.JobRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,10 +19,10 @@ public class AuthController {
  private final JobRepository jobs;
  private final PasswordEncoder encoder;
 
- public AuthController(UserRepository u,JobRepository j,PasswordEncoder e){users=u;jobs=j;encoder=e;}
+ public AuthController(UserRepository u, JobRepository j, PasswordEncoder e) { users=u; jobs=j; encoder=e; }
 
  @PostMapping("/register")
- public ResponseEntity<?> register(@RequestBody RegisterRequest r){
+ public ResponseEntity<?> register(@RequestBody RegisterRequest r, HttpSession session) {
   String name=trim(r.name()), email=lower(r.email());
   if(name.length()<2) return bad("Please enter your full name");
   if(email.isBlank()) return bad("Email address is required");
@@ -31,16 +32,18 @@ public class AuthController {
   if(users.findByEmail(email).isPresent()) return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","This email is already registered. Please sign in instead."));
   User u=new User();
   u.setName(name);u.setEmail(email);u.setPassword(encoder.encode(r.password()));u.setRole(role);
-  try{
+  try {
    User saved=users.save(u);
    claimDemoJobs(saved);
+   session.setAttribute("jobsphereUserId", saved.getId());
    return ResponseEntity.status(HttpStatus.CREATED).body(safe(saved));
+  } catch(DataIntegrityViolationException ex) {
+   return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","This email is already registered. Please sign in instead."));
   }
-  catch(DataIntegrityViolationException ex){return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message","This email is already registered. Please sign in instead."));}
  }
 
  @PostMapping("/login")
- public ResponseEntity<?> login(@RequestBody LoginRequest r){
+ public ResponseEntity<?> login(@RequestBody LoginRequest r, HttpSession session) {
   String email=lower(r.email());
   if(email.isBlank()||r.password()==null) return unauthorized();
   var user=users.findByEmail(email).orElse(null);
@@ -49,30 +52,35 @@ public class AuthController {
   if(r.role()!=null&&!r.role().isBlank()&&!user.getRole().name().equalsIgnoreCase(r.role()))
    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","This account is registered for a different role"));
   claimDemoJobs(user);
+  session.setAttribute("jobsphereUserId", user.getId());
   return ResponseEntity.ok(safe(user));
  }
 
- private void claimDemoJobs(User recruiter){
-  if(recruiter==null||recruiter.getRole()!=Role.RECRUITER) return;
+ @PostMapping("/logout")
+ public ResponseEntity<?> logout(HttpSession session) {
+  session.invalidate();
+  return ResponseEntity.noContent().build();
+ }
+
+ private void claimDemoJobs(User recruiter) {
+  if(recruiter==null||recruiter.getRole()!=Role.RECRUITER)return;
   jobs.findAll().forEach(job -> {
-   if(job.getRecruiter()==null && job.isActive() && "JobSphere Demo".equalsIgnoreCase(job.getSourceName())){
-    job.setRecruiter(recruiter);
-    jobs.save(job);
+   if(job.getRecruiter()==null&&job.isActive()&&"JobSphere Demo".equalsIgnoreCase(job.getSourceName())) {
+    job.setRecruiter(recruiter); jobs.save(job);
    }
   });
  }
- private Role parseRole(String r){
-  if(r==null||r.isBlank()) return Role.CANDIDATE;
+ private Role parseRole(String r) {
+  if(r==null||r.isBlank())return Role.CANDIDATE;
   try{return Role.valueOf(r.trim().toUpperCase(Locale.ROOT));}catch(Exception e){return Role.CANDIDATE;}
  }
- private Map<String,Object> safe(User u){return Map.of(
-  "id",u.getId(),"name",u.getName(),"email",u.getEmail(),"role",u.getRole(),
-  "phone",u.getPhone()==null?"":u.getPhone(),
-  "companyName",u.getCompanyName()==null?"":u.getCompanyName(),
-  "companyWebsite",u.getCompanyWebsite()==null?"":u.getCompanyWebsite(),
-  "companyIndustry",u.getCompanyIndustry()==null?"":u.getCompanyIndustry(),
-  "companyDescription",u.getCompanyDescription()==null?"":u.getCompanyDescription()
- );}
+ private Map<String,Object> safe(User u) {
+  return Map.of("id",u.getId(),"name",u.getName(),"email",u.getEmail(),"role",u.getRole(),
+   "phone",u.getPhone()==null?"":u.getPhone(),"companyName",u.getCompanyName()==null?"":u.getCompanyName(),
+   "companyWebsite",u.getCompanyWebsite()==null?"":u.getCompanyWebsite(),
+   "companyIndustry",u.getCompanyIndustry()==null?"":u.getCompanyIndustry(),
+   "companyDescription",u.getCompanyDescription()==null?"":u.getCompanyDescription());
+ }
  private ResponseEntity<?> bad(String m){return ResponseEntity.badRequest().body(Map.of("message",m));}
  private ResponseEntity<?> unauthorized(){return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Invalid email or password"));}
  private String trim(String s){return s==null?"":s.trim();}

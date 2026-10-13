@@ -85,7 +85,7 @@ function App(){
  },[]);
  const auth=(m,r)=>{setAuthMode(m);setAuthRole(r);go("auth")};
  const logout=async()=>{try{await api.logout()}catch{}localStorage.removeItem("jobsphereUser");setUser(null);notify("Signed out");go("home")};
- const apply=job=>{if(!user){setSelectedJob(job);auth("login","CANDIDATE");notify("Sign in to your candidate account before applying","error");return}if(user.role!=="CANDIDATE"){notify("Only candidate accounts can apply","error");return}setSelectedJob(job);go("apply")};
+ const apply=job=>{if(!user){setSelectedJob(job);setAuthMode("login");setAuthRole("CANDIDATE");setScreen("auth");setMenu(false);window.scrollTo(0,0);notify("Sign in to your candidate account before applying","error");return}if(user.role!=="CANDIDATE"){notify("Only candidate accounts can apply","error");return}setSelectedJob(job);go("apply")};
  const openCompany=n=>{
   const name=String(n||"").trim();
   const known=companyByName(name);

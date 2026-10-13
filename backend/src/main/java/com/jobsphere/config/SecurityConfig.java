@@ -34,16 +34,17 @@ public class SecurityConfig {
    .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
    .sessionFixation(f -> f.migrateSession())
   );
-  // Frontend/API may be on separate Render subdomains. SameSite=None is needed
-  // for cross-site XHR cookies, and Secure is appropriate on HTTPS deployments.
+  http.formLogin(cfg -> cfg.disable()).httpBasic(cfg -> cfg.disable());
+  // Spring's default servlet cookie is Lax. Separate hosted frontend and API
+  // origins need SameSite=None + Secure for cross-origin credentialed fetches.
   http.addFilterAfter(new org.springframework.web.filter.OncePerRequestFilter() {
    @Override
    protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
                                    jakarta.servlet.http.HttpServletResponse response,
-                                   jakarta.servlet.FilterChain filterChain)
+                                   jakarta.servlet.FilterChain chain)
                                    throws jakarta.servlet.ServletException, java.io.IOException {
-    response.setHeader("Access-Control-Expose-Headers", "Set-Cookie");
-    filterChain.doFilter(request, response);
+    chain.doFilter(request, response);
+    var context = org.springframework.security.core.context.SecurityContextHolder.getContext();
    }
   }, org.springframework.security.web.context.SecurityContextHolderFilter.class);
   http.formLogin(c -> c.disable()).httpBasic(c -> c.disable());

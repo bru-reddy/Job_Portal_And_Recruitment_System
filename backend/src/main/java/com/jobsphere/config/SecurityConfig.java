@@ -2,6 +2,7 @@ package com.jobsphere.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,11 +27,12 @@ public class SecurityConfig {
    x.setAllowedOriginPatterns(patterns);
    x.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
    x.setAllowedHeaders(List.of("*"));
+   x.setAllowCredentials(true);
    x.setMaxAge(3600L);
    return x;
   }));
-  // The login endpoint creates a server-side session. All reads remain public
-  // for job discovery; changing data and submitting applications require auth.
+  http.sessionManagement(s -> s.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED));
+  http.formLogin(c -> c.disable()).httpBasic(c -> c.disable());
   http.authorizeHttpRequests(a -> a
    .requestMatchers("/api/auth/**", "/api/health", "/api/jobs", "/api/jobs/*").permitAll()
    .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/jobs/recruiter/**").permitAll()

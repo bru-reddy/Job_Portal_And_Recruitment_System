@@ -22,6 +22,9 @@ public class SecurityConfig {
     "http://localhost:5173", "http://localhost:4173",
     "https://*.onrender.com", "https://*.vercel.app"
    ));
+   // Render static and web services use different subdomains, so the session
+   // cookie must be cross-site compatible when the frontend calls the API.
+   x.setAllowCredentials(true);
    String frontend = System.getenv("FRONTEND_URL");
    if (frontend != null && !frontend.isBlank()) patterns.add(frontend.trim().replaceAll("/$", ""));
    x.setAllowedOriginPatterns(patterns);
@@ -32,6 +35,7 @@ public class SecurityConfig {
    return x;
   }));
   http.sessionManagement(s -> s.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED));
+  http.sessionManagement(s -> s.sessionFixation(f -> f.migrateSession()));
   http.formLogin(c -> c.disable()).httpBasic(c -> c.disable());
   http.authorizeHttpRequests(a -> a
    .requestMatchers("/api/auth/**", "/api/health", "/api/jobs", "/api/jobs/*").permitAll()

@@ -306,3 +306,98 @@ input,textarea{color:var(--ink)}
 .card-footer small,.location,.eligibility span,.application-main p,.applicant-row span,.job-admin-row span{font-size:13px}
 @media(max-width:950px){.hero h1{font-size:clamp(2.25rem,7vw,2.8rem)}.hero-panel,.application-summary,.auth-side{padding:25px}.section,.inner-page{padding:48px 5%}}
 @media(max-width:600px){body{font-size:15px}.navbar{height:64px}.mobile-nav{top:64px}.hero{padding:42px 5%}.hero h1{font-size:2.25rem}.hero-lead{font-size:16px}.job-grid,.company-directory,.resource-grid,.mode-grid,.skill-category-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.stats div{padding:18px 6%;border-bottom:1px solid #e3e9eb}.section h2,.inner-page h2{font-size:26px}.page-heading h1{font-size:34px}.form-card,.auth-card{padding:22px}.auth-layout{grid-template-columns:1fr}.auth-side{padding:25px}.auth-side h1{font-size:32px}.form-grid{grid-template-columns:1fr}.dashboard-grid{grid-template-columns:1fr 1fr}.application-row,.applicant-row,.job-admin-row{gap:10px}.company-hero-card{align-items:flex-start;padding:22px}.company-hero-card h1{font-size:29px}}
+
+
+/* Editorial redesign pass: reduce template-like cards and decorative effects */
+:root{--ink:#202d35;--muted:#52616a;--line:#d9dfdc;--canvas:#f8f8f4;--blue:#365d72;--blue-dark:#284656;--blue-soft:#e8eff0;--sage:#e5eee6}
+body{background:#f8f8f4;color:#202d35;font-family:Arial,"Helvetica Neue",sans-serif;line-height:1.6}
+.navbar{height:76px;padding-inline:6%;background:#f8f8f4;border-bottom:1px solid #d9dfdc}
+.brand{font-size:18px;letter-spacing:-.04em}
+.brand-mark{border-radius:4px;background:#dce8e2;color:#315344}
+.navbar nav button{font-size:14px;font-weight:600;border-radius:3px!important;padding:11px 12px}
+.navbar nav button.active,.navbar nav button:hover{background:transparent;border-bottom:2px solid #557e70;color:#284d40}
+.hero{background:#eaf0ed;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:7%;padding:76px 8% 70px}
+.hero h1,.page-heading h1,.company-hero-card h1,.auth-side h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:-.045em}
+.hero h1{font-size:clamp(44px,5vw,64px);line-height:1.04;color:#233b35;max-width:680px}
+.eyebrow,.kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#557e70}
+.hero-lead{font-size:17px;line-height:1.8;max-width:590px;color:#465b55}
+.search-panel{border:1px solid #d3ddd7;border-radius:4px;background:#fff;padding:6px;box-shadow:none}
+.search-field{color:#65756d}
+.search-field input{font-size:15px}
+.btn,.apply{border-radius:4px;box-shadow:none;font-size:14px;font-weight:700}
+.btn.primary,.apply{background:#365d72;border-color:#365d72}
+.btn.primary:hover,.apply:hover{background:#284656}
+.hero-panel{background:#f8f8f4;border:1px solid #d4ded8;border-radius:4px;padding:30px;box-shadow:none}
+.hero-panel .kicker{color:#557e70}
+.hero-panel h3{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:27px;color:#233b35}
+.overview-row{border-top:1px solid #d9dfdc;padding:17px 0}
+.overview-row b{font-size:14px;color:#263b34}
+.overview-row small{font-size:13px;color:#52665e}
+.stats{background:#f8f8f4;border-bottom:1px solid #d9dfdc}
+.stats div{padding:24px 7%;border-right:1px solid #e1e5e1}
+.stats b{font-family:Georgia,"Times New Roman",serif;font-size:29px;font-weight:500;color:#557e70}
+.stats span{font-size:13px;color:#52616a}
+.section,.inner-page{padding:68px 8%}
+.section h2,.inner-page h2{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.2;font-weight:500;letter-spacing:-.025em;color:#263a34}
+.section-head{margin-bottom:28px}
+.section-head p,.page-heading p{font-size:15px;line-height:1.7;color:#52616a}
+.job-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 30px;border-top:1px solid #d9dfdc}
+.job-card{background:transparent;border:0;border-bottom:1px solid #d9dfdc;border-radius:0;padding:24px 8px 24px 0;box-shadow:none}
+.job-card:hover{background:#f0f3ee}
+.job-card h3{font-size:20px;letter-spacing:-.02em;font-weight:650;color:#243b35}
+.company-logo{border-radius:4px;background:#e2ebe5;color:#365b4a}
+.badge{border-radius:3px;background:#e5eee6;color:#315344;font-size:11px;letter-spacing:.02em}
+.posted{font-size:12px;color:#63736b}
+.tags span{border-radius:3px;background:#eeefea;color:#4e5f58;font-size:12px;font-weight:600}
+.eligibility{background:#f0f3ed;border:0;border-left:3px solid #a9c2b0;border-radius:0}
+.eligibility b{font-size:11px;color:#3f5d4c}
+.eligibility span{font-size:13px;color:#4c5f56}
+.card-footer{margin-top:18px}
+.card-footer b{font-size:15px}
+.card-footer small{font-size:12px;color:#63736b}
+.split-section{gap:8%}
+.section-sub.big{font-size:16px;line-height:1.85}
+.skill-preview{gap:0;border-top:1px solid #d9dfdc}
+.skill-preview div{border:0;border-bottom:1px solid #d9dfdc;border-radius:0;background:transparent;padding:20px 12px 20px 0}
+.skill-preview svg{color:#557e70}
+.company-directory,.resource-grid{gap:0 24px}
+.directory-card,.resource-card{background:transparent;border:0;border-bottom:1px solid #d9dfdc;border-radius:0;box-shadow:none;padding:23px 8px 24px 0}
+.directory-card:hover,.resource-card:hover{background:#f0f3ee}
+.directory-card h3,.resource-card h3{font-family:Georgia,"Times New Roman",serif;font-size:23px;font-weight:500;color:#263a34}
+.directory-card p,.resource-card p{font-size:14px;line-height:1.7;color:#52616a}
+.directory-link,.company-link,.text-btn,.back-btn{color:#365d72}
+.company-hero-card{background:#eaf0ed;border:1px solid #d5dfd9;border-radius:4px;color:#233b35;box-shadow:none}
+.company-hero-card h1{font-size:clamp(32px,4vw,44px)}
+.company-hero-card p{color:#52665e}
+.application-layout{gap:22px}
+.application-summary{background:#eaf0ed;border:1px solid #d5dfd9;border-radius:4px;color:#233b35;box-shadow:none}
+.application-summary h1{font-family:Georgia,"Times New Roman",serif;font-weight:500}
+.summary-list span{border:0;border-top:1px solid #d5dfd9;border-radius:0}
+.summary-list b{color:#557e70}
+.form-card,.workspace-card,.dash-card,.empty-state{background:#fff;border:1px solid #d9dfdc;border-radius:4px;box-shadow:none}
+.form-card{padding:32px}
+.form-heading h2{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:29px}
+.field{font-size:13px;font-weight:700;color:#344b42}
+.field input,.field textarea{border-radius:3px;border-color:#cbd5cf;background:#fff;min-height:46px}
+.field input:focus,.field textarea:focus{border-color:#668e7b;box-shadow:0 0 0 2px #dfeae2}
+.dashboard-grid{gap:0;border-top:1px solid #d9dfdc;border-bottom:1px solid #d9dfdc}
+.dash-card{border:0;border-right:1px solid #e2e6e1;border-radius:0;padding:22px;background:transparent}
+.dash-icon{color:#557e70}
+.dash-card b{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:31px;color:#263a34}
+.application-row,.applicant-row,.job-admin-row{border-top:1px solid #d9dfdc}
+.auth-layout{border:1px solid #d9dfdc;border-radius:4px;box-shadow:none}
+.auth-side{background:#eaf0ed;border:0;border-radius:0}
+.auth-side h1{font-size:42px}
+.auth-side p{color:#52665e}
+.auth-card{background:#fff}
+.role-switch button{border-radius:3px}
+.role-switch button.selected{background:#e5eee6;border-color:#a9c2b0;color:#315344}
+.company-code-note{border-radius:3px;background:#f0edf7;border-color:#e2dced}
+.mode-grid button,.skill-category-grid button{border:0;border-bottom:1px solid #d9dfdc;border-radius:0;background:transparent;box-shadow:none}
+.mode-grid h2{font-family:Georgia,"Times New Roman",serif;font-weight:500}
+.resource-btn{border-radius:3px;background:#365d72}
+footer{background:#f8f8f4;border-top:1px solid #d9dfdc;padding:30px 8%;color:#52616a}
+footer .brand{color:#263a34}
+.toast{border-radius:4px}
+@media(max-width:950px){.hero{padding:54px 5%;gap:28px}.section,.inner-page{padding:48px 5%}.hero h1{font-size:clamp(40px,7vw,54px)}}
+@media(max-width:600px){.navbar{height:64px;padding-inline:4%}.hero{grid-template-columns:1fr;padding:42px 5%}.hero h1{font-size:42px}.section h2,.inner-page h2{font-size:29px}.job-grid,.company-directory,.resource-grid{grid-template-columns:1fr}.job-card{padding:22px 4px}.form-card{padding:22px}.dashboard-grid{grid-template-columns:1fr 1fr}.dash-card{border-bottom:1px solid #e2e6e1;padding:17px}.stats b{font-size:25px}}

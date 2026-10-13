@@ -34,13 +34,23 @@ public class SecurityConfig {
    .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
    .sessionFixation(f -> f.migrateSession())
   );
-  http.headers(h -> h.addHeaderWriter((request, response) -> {
-   String cookie = response.getHeader("Set-Cookie");
-   if (cookie != null && cookie.contains("JSESSIONID") && !cookie.toLowerCase().contains("samesite")) {
-    response.setHeader("Set-Cookie", cookie + "; SameSite=None; Secure; HttpOnly");
-   }
-  }));
   http.formLogin(c -> c.disable()).httpBasic(c -> c.disable());
+  // SameSite=None is required for JSESSIONID when the web app and API are on
+  // separate Render subdomains. Secure cookies are expected on hosted HTTPS.
+  http.addFilterAfter(new org.springframework.web.filter.OncePerRequestFilter() {
+   @Override
+   protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
+                                   jakarta.servlet.http.HttpServletResponse response,
+                                   jakarta.servlet.FilterChain chain)
+                                   throws jakarta.servlet.ServletException, java.io.IOException {
+    chain.doFilter(request, response);
+    for (String header : response.getHeaders("Set-Cookie")) {
+     if (header.startsWith("JSESSIONID=") && !header.toLowerCase().contains("samesite")) {
+      response.setHeader("Set-Cookie", header + "; SameSite=None; Secure; HttpOnly");
+     }
+    }
+   }
+  }, org.springframework.security.web.context.SecurityContextHolderFilter.class);
   http.authorizeHttpRequests(a -> a
    .requestMatchers("/api/auth/**", "/api/health", "/api/jobs", "/api/jobs/*").permitAll()
    .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/jobs/recruiter/**").permitAll()

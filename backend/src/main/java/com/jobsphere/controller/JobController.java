@@ -5,6 +5,8 @@ import com.jobsphere.repository.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import jakarta.servlet.http.HttpSession;
+import java.util.Map;
 @RestController @RequestMapping("/api/jobs")
 public class JobController {
  private final JobRepository jobs; private final UserRepository users;
@@ -21,8 +23,11 @@ public class JobController {
  public ResponseEntity<Job> get(@PathVariable Long id){return jobs.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());}
 
  @PostMapping
- public ResponseEntity<?> create(@RequestBody JobRequest r){
-  var recruiter=users.findById(r.recruiterId()).orElse(null);
+ public ResponseEntity<?> create(@RequestBody JobRequest r, HttpSession session){
+  Long signedInUserId = (Long) session.getAttribute("jobsphereUserId");
+  if (signedInUserId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Please sign in as a recruiter."));
+  if (r.recruiterId() == null || !signedInUserId.equals(r.recruiterId())) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","You cannot post jobs for another account."));
+  var recruiter=users.findById(signedInUserId).orElse(null);
   if(recruiter==null||recruiter.getRole()!=Role.RECRUITER)return ResponseEntity.badRequest().body("Valid recruiter required");
   if(r.title()==null||r.title().isBlank()||r.location()==null||r.location().isBlank()||r.company()==null||r.company().isBlank())
    return ResponseEntity.badRequest().body("Title, company and location are required");
@@ -35,7 +40,12 @@ public class JobController {
  }
 
  @DeleteMapping("/{id}")
- public ResponseEntity<?> close(@PathVariable Long id){
-  return jobs.findById(id).map(j->{j.setActive(false);jobs.save(j);return ResponseEntity.ok().build();}).orElse(ResponseEntity.notFound().build());
+ public ResponseEntity<?> close(@PathVariable Long id, HttpSession session){
+  Long signedInUserId = (Long) session.getAttribute("jobsphereUserId");
+  if (signedInUserId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Please sign in to continue."));
+  return jobs.findById(id).map(j->{
+   if (j.getRecruiter() == null || !signedInUserId.equals(j.getRecruiter().getId())) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+   j.setActive(false);jobs.save(j);return ResponseEntity.ok().build();
+  }).orElse(ResponseEntity.notFound().build());
  }
 }
